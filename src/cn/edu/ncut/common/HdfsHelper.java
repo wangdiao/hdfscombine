@@ -22,6 +22,7 @@ public class HdfsHelper {
 	public static void upload(InputStream is, long filelen, String path) throws IOException{
 		OutputStream os = fs.create(new Path(path));
 		IOUtils.copyBytes(is, os, filelen, 4096, false);
+		IOUtils.closeStream(os);
 	}
 	
 	public static void delete(String path, boolean recursion) throws IOException{
@@ -31,6 +32,7 @@ public class HdfsHelper {
 	public static void fetch(OutputStream os, String path) throws IOException{
 		InputStream is = fs.open(new Path(path));
 		IOUtils.copyBytes(is, os,4096);
+		IOUtils.closeStream(is);
 	}
 	
 	public static void fetchSequence(OutputStream os, String path, long pos, String name) throws IOException{

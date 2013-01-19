@@ -8,10 +8,10 @@ public class KeyUtils {
 	public static final String SUBDIRHASHNAME = "subdir";
 	public static final String GLOBALDIRID = "global:dirid";
 	public static String subdirid(String dirname){
-		return FILESHASHNAME+dirname;
+		return FILESHASHNAME+":"+dirname;
 	}
 	
 	public static String filesid(String dirname){
-		return SUBDIRHASHNAME+dirname;
+		return SUBDIRHASHNAME+":"+dirname;
 	}
 }

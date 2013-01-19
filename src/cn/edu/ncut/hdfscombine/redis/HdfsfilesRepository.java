@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
@@ -96,7 +97,6 @@ public class HdfsfilesRepository {
 	}
 
 	public long addCacheFile(String path, CacheFile cacheFile) {
-		// TODO redis的hash添加失败
 		File file = new File(path);
 		String name = file.getName();
 		String dirname = file.getParent();
@@ -139,8 +139,9 @@ public class HdfsfilesRepository {
 	public void CombineCache(String path) {
 		BoundHashOperations<String, String, CacheFile> filesOps = stringRedisTemplate
 				.boundHashOps(KeyUtils.CACHEFILESHASHBAK);
+		SequenceFile.Writer writer = null;
 		try {
-			SequenceFile.Writer writer = SequenceFile.createWriter(
+			writer = SequenceFile.createWriter(
 					HdfsStaticResource.getFileSystem(),
 					HdfsStaticResource.getConfiguration(),
 					new Path(SmallFile.getBasepath() + path), Text.class,
@@ -162,8 +163,11 @@ public class HdfsfilesRepository {
 				String[] akey = skey.split(":");
 				addMetaFileByDirid(akey[0], metaFile);
 			}
+			writer.syncFs();
 		} catch (IOException e) {
 			logger.error(e);
+		} finally {
+			IOUtils.closeStream(writer);
 		}
 
 	}
@@ -179,23 +183,45 @@ public class HdfsfilesRepository {
 				.boundHashOps(KeyUtils.subdirid(dirid));
 		dirOps.put(KeyUtils.subdirid(dirid),
 				String.valueOf(dirIdCounter.incrementAndGet()));
-		stringRedisTemplate.setHashValueSerializer(jdkSerializationRedisSerializer);
+		stringRedisTemplate
+				.setHashValueSerializer(jdkSerializationRedisSerializer);
 	}
 
+	/**
+	 * 判断文件系统中是否存在文件
+	 * 
+	 * @param path
+	 *            文件路径
+	 * @return
+	 */
 	public boolean isExist(String path) {
+		return existPos(path) != 0;
+	}
+
+	/**
+	 * 判断文件系统中文件的位置
+	 * 
+	 * @param path
+	 *            文件路径
+	 * @return 0-不存在，1-cache中，2-hdfs上
+	 */
+	public int existPos(String path) {
 		File file = new File(path);
 		String name = file.getName();
 		String dirname = file.getParent();
 		String dirid = getDirid(dirname);
 		BoundHashOperations<String, String, CacheFile> cachefilesOps = stringRedisTemplate
 				.boundHashOps(KeyUtils.CACHEFILESHASH);
-		boolean b = cachefilesOps.hasKey(dirid + ":" + name);
-		if (!b) {
+		if (cachefilesOps.hasKey(dirid + ":" + name)) {
+			return 1;
+		} else {
 			BoundHashOperations<String, String, MetaFile> filesOps = stringRedisTemplate
 					.boundHashOps(KeyUtils.filesid(dirid));
-			b = filesOps.hasKey(name);
+			if (filesOps.hasKey(name)) {
+				return 2;
+			}
 		}
-		return b;
+		return 0;
 	}
 
 	public String getDirid(String dirname) {
@@ -209,14 +235,15 @@ public class HdfsfilesRepository {
 				dirlist.add(item);
 			}
 		}
-		
+
 		stringRedisTemplate.setHashValueSerializer(stringRedisSerializer);
 		BoundHashOperations<String, String, String> dirOps = stringRedisTemplate
 				.boundHashOps(KeyUtils.subdirid(dirid));
 		for (String item : dirlist) {
 			dirid = dirOps.get(item);
 		}
-		stringRedisTemplate.setHashValueSerializer(jdkSerializationRedisSerializer);
+		stringRedisTemplate
+				.setHashValueSerializer(jdkSerializationRedisSerializer);
 		return dirid;
 	}
 

@@ -30,6 +30,13 @@ public interface HDFSEXTFile {
 	 */
 	public abstract boolean delete(String filename) throws IOException;
 
+	/**
+	 * 获取文件，out写入文件大学，文件内容
+	 * @param out
+	 * @param filename
+	 * @return
+	 * @throws IOException
+	 */
 	public abstract boolean fetch(OutputStream out, String filename)
 			throws IOException;
 	

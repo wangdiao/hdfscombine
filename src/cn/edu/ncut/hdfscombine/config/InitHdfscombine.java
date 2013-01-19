@@ -26,7 +26,7 @@ public class InitHdfscombine extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		Thread thread = new Thread(new FileServer());
-		thread.setDaemon(true);
+//		thread.setDaemon(true);
 		thread.start();
 		System.out.println("Socket接收服务启动完成");
 		ApplicationContext ac = WebApplicationContextUtils

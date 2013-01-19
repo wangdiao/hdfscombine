@@ -21,10 +21,11 @@ import cn.edu.ncut.hdfscombine.redis.HdfsfilesRepository;
 public class SmallFile implements HDFSEXTFile {
 
 	private final static Logger logger = Logger.getLogger(SmallFile.class);
-	public void setHdfsfilesRepository(HdfsfilesRepository hdfsfilesRepository){
+
+	public void setHdfsfilesRepository(HdfsfilesRepository hdfsfilesRepository) {
 		this.hdfsfilesRepository = hdfsfilesRepository;
 	}
-	
+
 	private final static String basepath = ConfigSingleton.getInstance()
 			.getProperty("smallbasepath");
 	private long filesize = Long.parseLong(ConfigSingleton.getInstance()
@@ -56,12 +57,21 @@ public class SmallFile implements HDFSEXTFile {
 
 		// 打包
 		if (maplen + filelen > filesize) {
-			synchronized (SmallFile.class) {
-				String storename = new Long(System.currentTimeMillis()).toString();
-				hdfsfilesRepository.StartCombineCache();
-				hdfsfilesRepository.CombineCache(storename);
-				hdfsfilesRepository.EndCombineCache();
-			}
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					synchronized (SmallFile.class) {
+						logger.debug("Start Combine!");
+						String storename = new Long(System.currentTimeMillis())
+								.toString();
+						hdfsfilesRepository.StartCombineCache();
+						hdfsfilesRepository.CombineCache(storename);
+						hdfsfilesRepository.EndCombineCache();
+						logger.debug("-------------------------------------End Combine!");
+					}
+				}
+			};
+			new Thread(runnable).start();
 		}
 	}
 
@@ -81,13 +91,14 @@ public class SmallFile implements HDFSEXTFile {
 	@Override
 	public boolean fetch(OutputStream out, String filename) throws IOException {
 		CacheFile cacheFile;
-		if (hdfsfilesRepository.isExist(filename)) {
+		int pos = hdfsfilesRepository.existPos(filename);
+		if (pos==1) {
 			cacheFile = hdfsfilesRepository.getCacheFile(filename);
-		} else {
-			String dirid = hdfsfilesRepository.getDirid(filename);
+		} else if(pos==2) {
+			String dirid = hdfsfilesRepository.getDirid(new File(filename).getParent());
 			MetaFile metaFile = hdfsfilesRepository.getMetaFile(dirid,
 					new File(filename).getName());
-			if (metaFile.getStorepos() != -1L)
+			if (metaFile.getStorepos() == -1L)
 				return false;
 			cacheFile = new CacheFile();
 			cacheFile.setLength(metaFile.getLength());
@@ -97,6 +108,8 @@ public class SmallFile implements HDFSEXTFile {
 			HdfsHelper.fetchSequence(os, uri, metaFile.getStorepos(), dirid
 					+ ":" + metaFile.getName());
 			cacheFile.setContent(os.toByteArray());
+		}else{
+			return false;
 		}
 		InputStream is = new ByteArrayInputStream(cacheFile.getContent());
 		SocketStream.writeInteger(cacheFile.getLength().intValue(), out);

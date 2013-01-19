@@ -55,7 +55,7 @@ public class HandleFileService {
 	}
 
 	/**
-	 * 从文件系统上获取文件，输出流为：文件内容
+	 * 从文件系统上获取文件，输出流为：操作标识、文件大小、文件内容
 	 * 
 	 * @param is
 	 * @param out
@@ -69,6 +69,7 @@ public class HandleFileService {
 			}
 			SmallFile smallFile = new SmallFile();
 			smallFile.setHdfsfilesRepository(hdfsfilesRepository);
+			SocketStream.writeInteger(FileOperateMark.FETCHEDSUCCESS, out);
 			if (!smallFile.fetch(out, filename)) {
 				BigFile bigFile = new BigFile();
 				bigFile.setHdfsfilesRepository(hdfsfilesRepository);
