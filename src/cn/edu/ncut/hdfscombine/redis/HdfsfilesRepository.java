@@ -9,6 +9,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.SequenceFile.Writer.Option;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.log4j.Logger;
@@ -141,11 +142,22 @@ public class HdfsfilesRepository {
 				.boundHashOps(KeyUtils.CACHEFILESHASHBAK);
 		SequenceFile.Writer writer = null;
 		try {
+//			writer = SequenceFile.createWriter(
+//					HdfsStaticResource.getFileSystem(),
+//					HdfsStaticResource.getConfiguration(),
+//					new Path(SmallFile.getBasepath() + path), Text.class,
+//					BytesWritable.class, CompressionType.BLOCK);
+			Option fileOption = SequenceFile.Writer.file(new Path(SmallFile
+					.getBasepath() + path));
+			Option compressionOption = SequenceFile.Writer
+					.compression(CompressionType.BLOCK);
+			Option keyclassOption = SequenceFile.Writer.keyClass(Text.class);
+			Option valueclassOption = SequenceFile.Writer
+					.valueClass(BytesWritable.class);
 			writer = SequenceFile.createWriter(
-					HdfsStaticResource.getFileSystem(),
-					HdfsStaticResource.getConfiguration(),
-					new Path(SmallFile.getBasepath() + path), Text.class,
-					BytesWritable.class, CompressionType.BLOCK);
+					HdfsStaticResource.getConfiguration(), fileOption,
+					compressionOption, keyclassOption, valueclassOption);
+			
 			Text key = new Text();
 			BytesWritable value = null;
 			for (String skey : filesOps.keys()) {
@@ -163,7 +175,7 @@ public class HdfsfilesRepository {
 				String[] akey = skey.split(":");
 				addMetaFileByDirid(akey[0], metaFile);
 			}
-			writer.syncFs();
+			writer.hflush();
 		} catch (IOException e) {
 			logger.error(e);
 		} finally {

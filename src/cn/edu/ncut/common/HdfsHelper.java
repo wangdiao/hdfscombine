@@ -11,6 +11,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.SequenceFile;
+import org.apache.hadoop.io.SequenceFile.Reader;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.util.ReflectionUtils;
 
@@ -21,7 +22,7 @@ public class HdfsHelper {
 	
 	public static void upload(InputStream is, long filelen, String path) throws IOException{
 		OutputStream os = fs.create(new Path(path));
-		IOUtils.copyBytes(is, os, filelen, 4096, false);
+		IOUtils.copyBytes(is, os, filelen, false);
 		IOUtils.closeStream(os);
 	}
 	
@@ -38,7 +39,9 @@ public class HdfsHelper {
 	public static void fetchSequence(OutputStream os, String path, long pos, String name) throws IOException{
 		SequenceFile.Reader reader = null;
 		try {
-			reader = new SequenceFile.Reader(fs, new Path(path), conf);
+//			reader = new SequenceFile.Reader(fs, new Path(path), conf);
+			Reader.Option fileOption = Reader.file(new Path(path));
+			reader = new SequenceFile.Reader(conf, fileOption);
 			reader.seek(pos);
 			Text key = (Text) ReflectionUtils.newInstance(reader.getKeyClass(),
 					conf);

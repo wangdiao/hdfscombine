@@ -44,7 +44,7 @@ public class SmallFile implements HDFSEXTFile {
 		// 保存到文件缓存中
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			IOUtils.copyBytes(is, out, filelen, 4096, false);
+			IOUtils.copyBytes(is, out, filelen, false);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			throw e;
