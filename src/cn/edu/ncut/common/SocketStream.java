@@ -7,21 +7,20 @@ import java.io.OutputStream;
 public class SocketStream {
 	// 读取一个数字
 	public static int readInteger(InputStream is) throws IOException {
-		byte[] bytes = new byte[4];
-		is.read(bytes);
+		byte[] bytes = read(is, 4);
 		return ByteHelper.b2i(bytes);
 	}
-	
+
 	// 写入一个数字
-	public static void writeInteger(int num, OutputStream out) throws IOException {
+	public static void writeInteger(int num, OutputStream out)
+			throws IOException {
 		out.write(ByteHelper.i2b(num));
 	}
 
 	// 读取一个字符串
 	public static String readString(InputStream is) throws IOException {
 		int len = readInteger(is);
-		byte[] bytes = new byte[len];
-		is.read(bytes);
+		byte[] bytes = SocketStream.read(is, len);
 		return new String(bytes);
 	}
 
@@ -34,4 +33,30 @@ public class SocketStream {
 		os.write(fn_bytes); // 输出文件名
 	}
 
+	// 读取一个字节组
+	public static byte[] readBytes(InputStream is) throws IOException {
+		int len = readInteger(is);
+		byte[] bytes = SocketStream.read(is, len);
+		return bytes;
+	}
+
+	public static byte[] read(InputStream is, int len) throws IOException {
+		byte[] buf = new byte[len];
+		byte[] tmp = new byte[len];
+		int length = 0;
+		while (true) {
+			int lengthTemp = is.read(tmp, 0, len - length);
+			if (lengthTemp < 0) {
+				continue;
+			}
+			System.arraycopy(tmp, 0, buf, length, lengthTemp);
+			length += lengthTemp;
+			if (length >= len) {
+				// 读取完成
+				break;
+			}
+		}
+
+		return buf;
+	}
 }
