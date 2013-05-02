@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import org.apache.log4j.Logger;
 
 import cn.edu.ncut.common.FileOperateMark;
-import cn.edu.ncut.common.HdfsHelper;
 import cn.edu.ncut.common.SocketStream;
 import cn.edu.ncut.hdfscombine.redis.HdfsfilesRepository;
 
@@ -16,10 +15,10 @@ import cn.edu.ncut.hdfscombine.redis.HdfsfilesRepository;
  * @author wang
  * 
  */
-public class HandleFileService {
+public class CommonFileService {
 
 	private final static Logger logger = Logger
-			.getLogger(HandleFileService.class);
+			.getLogger(CommonFileService.class);
 
 	private static HdfsfilesRepository hdfsfilesRepository;
 
@@ -104,34 +103,6 @@ public class HandleFileService {
 			} catch (IOException e1) {
 				logger.error(e);
 			}
-		}
-	}
-
-	public static void directupload(InputStream is, OutputStream out) {
-		try {
-			String filename = SocketStream.readString(is);
-			int len = SocketStream.readInteger(is);
-			HdfsHelper.upload(is, len, filename);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void directfetch(InputStream is, OutputStream out) {
-		try {
-			String filename = SocketStream.readString(is);
-			HdfsHelper.fetch(out, filename);
-		} catch (IOException e) {
-			logger.error(e);
-		}
-	}
-
-	public static void directdelete(InputStream is, OutputStream out) {
-		try {
-			String filename = SocketStream.readString(is);
-			HdfsHelper.delete(filename, false);
-		} catch (IOException e) {
-			logger.error(e);
 		}
 	}
 }
