@@ -142,11 +142,6 @@ public class HdfsfilesRepository {
 				.boundHashOps(KeyUtils.CACHEFILESHASHBAK);
 		SequenceFile.Writer writer = null;
 		try {
-//			writer = SequenceFile.createWriter(
-//					HdfsStaticResource.getFileSystem(),
-//					HdfsStaticResource.getConfiguration(),
-//					new Path(SmallFile.getBasepath() + path), Text.class,
-//					BytesWritable.class, CompressionType.BLOCK);
 			Option fileOption = SequenceFile.Writer.file(new Path(SmallFile
 					.getBasepath() + path));
 			Option compressionOption = SequenceFile.Writer

@@ -39,7 +39,6 @@ public class HdfsHelper {
 	public static void fetchSequence(OutputStream os, String path, long pos, String name) throws IOException{
 		SequenceFile.Reader reader = null;
 		try {
-//			reader = new SequenceFile.Reader(fs, new Path(path), conf);
 			Reader.Option fileOption = Reader.file(new Path(path));
 			reader = new SequenceFile.Reader(conf, fileOption);
 			reader.seek(pos);
