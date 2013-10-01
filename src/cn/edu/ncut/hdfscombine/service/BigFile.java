@@ -46,6 +46,7 @@ public class BigFile implements HDFSEXTFile {
 		}
 		
 		//添加元数据项
+		//TODO: 大文件计划不保存元数据
 		MetaFile metaFile = new MetaFile();
 		metaFile.setLength(filelen);
 		metaFile.setName(new File(filename).getName());

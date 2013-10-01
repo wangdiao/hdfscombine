@@ -4,6 +4,7 @@ public class FileOperateMark {
 	public static final int IN_COMMON = 10;
 	public static final int IN_DIRECT = 11;
 	
+	public static final int NOEXISTED = 0;
 	public static final int EXISTED = -1;
 	public static final int NOTFOUND = -2;
 	public static final int UPLOADSUCCESS = -3;

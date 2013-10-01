@@ -53,7 +53,7 @@ public class SmallFile implements HDFSEXTFile {
 		cacheFile.setContent(out.toByteArray());
 		cacheFile.setLength(filelen);
 		cacheFile.setName(new File(filename).getName());
-		long maplen = hdfsfilesRepository.addCacheFile(filename, cacheFile);
+		long maplen = hdfsfilesRepository.addCacheFileByName(filename, cacheFile);
 
 		// 打包
 		if (maplen + filelen > filesize) {
@@ -91,13 +91,12 @@ public class SmallFile implements HDFSEXTFile {
 	@Override
 	public boolean fetch(OutputStream out, String filename) throws IOException {
 		CacheFile cacheFile;
-		int pos = hdfsfilesRepository.existPos(filename);
-		if (pos==1) {
-			cacheFile = hdfsfilesRepository.getCacheFile(filename);
-		} else if(pos==2) {
-			String dirid = hdfsfilesRepository.getDirid(new File(filename).getParent());
-			MetaFile metaFile = hdfsfilesRepository.getMetaFile(dirid,
-					new File(filename).getName());
+		String pathid = hdfsfilesRepository.getPathId(filename);
+		int pos = hdfsfilesRepository.existPos(pathid);
+		if (pos == 1) {
+			cacheFile = hdfsfilesRepository.getCacheFile(pathid);
+		} else if (pos == 2) {
+			MetaFile metaFile = hdfsfilesRepository.getMetaFile(pathid);
 			if (metaFile.getStorepos() == -1L)
 				return false;
 			cacheFile = new CacheFile();
@@ -105,10 +104,9 @@ public class SmallFile implements HDFSEXTFile {
 			cacheFile.setName(metaFile.getName());
 			String uri = basepath + metaFile.getStorename();
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			HdfsHelper.fetchSequence(os, uri, metaFile.getStorepos(), dirid
-					+ ":" + metaFile.getName());
+			HdfsHelper.fetchSequence(os, uri, metaFile.getStorepos(), pathid);
 			cacheFile.setContent(os.toByteArray());
-		}else{
+		} else {
 			return false;
 		}
 		InputStream is = new ByteArrayInputStream(cacheFile.getContent());

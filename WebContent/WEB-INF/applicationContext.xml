@@ -30,4 +30,6 @@
 	</bean>
 	<bean id="stringRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
 		p:connection-factory-ref="jedisConnectionFactory" />
+	<bean id="jdkRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
+		p:connection-factory-ref="jedisConnectionFactory" />
 </beans>

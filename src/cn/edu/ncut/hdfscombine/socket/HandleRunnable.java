@@ -53,7 +53,7 @@ public class HandleRunnable implements Runnable {
 
 		} catch (IOException | SecurityException | IllegalArgumentException
 				| ReflectiveOperationException e) {
-			logger.error(e);
+			e.printStackTrace();
 		}
 		IOUtils.closeSocket(socket);
 	}

@@ -34,21 +34,22 @@ public class CommonFileService {
 	 */
 	public static void upload(InputStream is, OutputStream out) {
 		try {
-			String filename = SocketStream.readString(is);
-			int len = SocketStream.readInteger(is);
-			if (hdfsfilesRepository.isExist(filename)) {
+			String storeid = SocketStream.readString(is);
+			if (hdfsfilesRepository.isExist(storeid)) {
 				SocketStream.writeInteger(FileOperateMark.EXISTED, out);
 				return;
 			}
+			SocketStream.writeInteger(FileOperateMark.NOEXISTED, out);
+			int len = SocketStream.readInteger(is);
 			HDFSEXTFile file = HDFSEXTFileFactory.createHDFSEXTFile(len,
 					hdfsfilesRepository);
-			file.save(is, len, filename);
+			file.save(is, len, storeid);
 			SocketStream.writeInteger(FileOperateMark.UPLOADSUCCESS, out);
 		} catch (IOException e) {
 			try {
 				SocketStream.writeInteger(FileOperateMark.UPLOADFAILD, out);
 			} catch (IOException e1) {
-				logger.error(e);
+				e.printStackTrace();
 			}
 		}
 	}
