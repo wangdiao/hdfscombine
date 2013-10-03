@@ -10,7 +10,6 @@ import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Writer.Option;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,8 +25,6 @@ import cn.edu.ncut.hdfscombine.service.SmallFile;
 
 @Service
 public class HdfsfilesRepository {
-	private final static Logger logger = Logger
-			.getLogger(HdfsfilesRepository.class);
 	private final StringRedisTemplate stringRedisTemplate;
 	private final StringRedisTemplate jdkRedisTemplate;
 	private final RedisAtomicLong pathIdCounter;

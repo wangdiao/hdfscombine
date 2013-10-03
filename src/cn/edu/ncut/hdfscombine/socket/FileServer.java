@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import cn.edu.ncut.common.ConfigSingleton;
@@ -22,7 +23,6 @@ public class FileServer implements Runnable {
 		try {
 			server = new ServerSocket(port);
 			ExecutorService writeservice = Executors.newCachedThreadPool();
-			// 开始循环
 			while (true) {
 				Socket socket = server.accept();
 				writeservice.execute(new HandleRunnable(socket));
@@ -30,6 +30,11 @@ public class FileServer implements Runnable {
 		} catch (Exception e) {
 			logger.error(e);
 		}
+	}
+	
+	@Override
+	public void finalize(){
+		IOUtils.closeQuietly(server);
 	}
 
 

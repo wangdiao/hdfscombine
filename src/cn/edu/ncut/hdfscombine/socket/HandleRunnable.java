@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import java.net.Socket;
 
 import org.apache.hadoop.io.IOUtils;
-import org.apache.log4j.Logger;
 
 import cn.edu.ncut.common.FileOperateMark;
 import cn.edu.ncut.common.SocketStream;
@@ -23,7 +22,6 @@ import cn.edu.ncut.hdfscombine.service.CommonFileService;
  */
 public class HandleRunnable implements Runnable {
 
-	private final static Logger logger = Logger.getLogger(HandleRunnable.class);
 	private Socket socket;
 
 	public HandleRunnable(Socket socket) {
