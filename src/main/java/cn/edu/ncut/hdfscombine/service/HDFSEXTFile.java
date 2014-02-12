@@ -19,7 +19,7 @@ public interface HDFSEXTFile {
 	 *            文件名
 	 * @throws IOException
 	 */
-	public abstract void save(InputStream is, long filelen, String filename)
+	public abstract void save(InputStream is, int filelen, String filename)
 			throws IOException;
 
 	/**

@@ -53,36 +53,36 @@ public class HdfsfilesRepository {
 	 * @param file
 	 */
 	public void addMetaFile(String pathid, MetaFile file) {
-			BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.METAFILESHASH);
-			filesOps.put(pathid, file);
+		BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.METAFILESHASH);
+		filesOps.put(pathid, file);
 	}
 
 	public MetaFile getMetaFile(String pathid) {
-			BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.METAFILESHASH);
-			return filesOps.get(pathid);
-			}
+		BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.METAFILESHASH);
+		return filesOps.get(pathid);
+	}
 
 	public void delMetaFile(String pathid) {
-			BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.METAFILESHASH);
-			filesOps.delete(pathid);
+		BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.METAFILESHASH);
+		filesOps.delete(pathid);
 	}
 
 	public void disableMetaFile(String pathid) {
-			BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.METAFILESHASH);
-			MetaFile metaFile = filesOps.get(pathid);
-			metaFile.setStatus(false);
-			filesOps.put(pathid, metaFile);
+		BoundHashOperations<String, String, MetaFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.METAFILESHASH);
+		MetaFile metaFile = filesOps.get(pathid);
+		metaFile.setStatus(false);
+		filesOps.put(pathid, metaFile);
 	}
 
 	public long addCacheFile(String pathid, CacheFile cacheFile) {
-			BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.CACHEFILESHASH);
-			filesOps.put(pathid, cacheFile);
-			return cacheLengthCounter.addAndGet(cacheFile.getLength());
+		BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.CACHEFILESHASH);
+		filesOps.put(pathid, cacheFile);
+		return cacheLengthCounter.addAndGet(cacheFile.getLength());
 	}
 
 	public long addCacheFileByName(String filename, CacheFile cacheFile) {
@@ -91,29 +91,29 @@ public class HdfsfilesRepository {
 	}
 
 	public CacheFile getCacheFile(String pathid) {
-			BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.CACHEFILESHASH);
-			return filesOps.get(pathid);
+		BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.CACHEFILESHASH);
+		return filesOps.get(pathid);
 	}
 
 	public void delCacheFile(String pathid) {
-			BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.CACHEFILESHASH);
-			CacheFile cacheFile = filesOps.get(pathid);
-			cacheLengthCounter.addAndGet(0L - cacheFile.getLength());
-			filesOps.delete(pathid);
+		BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.CACHEFILESHASH);
+		CacheFile cacheFile = filesOps.get(pathid);
+		cacheLengthCounter.addAndGet(0L - cacheFile.getLength());
+		filesOps.delete(pathid);
 	}
 
 	public void StartCombineCache() {
-			cacheLengthCounter.set(0L);
-			BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.CACHEFILESHASH);
-			filesOps.rename(KeyUtils.CACHEFILESHASHBAK);
+		cacheLengthCounter.set(0L);
+		BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
+				.boundHashOps(KeyUtils.CACHEFILESHASH);
+		filesOps.rename(KeyUtils.CACHEFILESHASHBAK);
 	}
 
 	public void CombineCache(String path) {
 		BoundHashOperations<String, String, CacheFile> filesOps = jdkRedisTemplate
-					.boundHashOps(KeyUtils.CACHEFILESHASHBAK);
+				.boundHashOps(KeyUtils.CACHEFILESHASHBAK);
 		SequenceFile.Writer writer = null;
 		try {
 			Option fileOption = SequenceFile.Writer.file(new Path(SmallFile
@@ -167,10 +167,16 @@ public class HdfsfilesRepository {
 	}
 
 	public String getPathId(String storepath) {
-			BoundHashOperations<String, String, String> dirOps = stringRedisTemplate
-					.boundHashOps(KeyUtils.STOREPATHHASH);
-			String pathid = dirOps.get(storepath);
-			return pathid;
+		BoundHashOperations<String, String, String> dirOps = stringRedisTemplate
+				.boundHashOps(KeyUtils.STOREPATHHASH);
+		String pathid = dirOps.get(storepath);
+		return pathid;
+	}
+	
+	public void delPath(String storepath) {
+		BoundHashOperations<String, String, String> dirOps = stringRedisTemplate
+				.boundHashOps(KeyUtils.STOREPATHHASH);
+		dirOps.delete(storepath);
 	}
 
 	public String addStorePath(String storepath) {

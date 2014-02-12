@@ -34,8 +34,8 @@ public class CommonFileService {
 	 */
 	public static void upload(InputStream is, OutputStream out) {
 		try {
-			String storeid = SocketStream.readString(is);
-			if (hdfsfilesRepository.isExist(storeid)) {
+			String storepath = SocketStream.readString(is);
+			if (hdfsfilesRepository.isExist(storepath)) {
 				SocketStream.writeInteger(FileOperateMark.EXISTED, out);
 				return;
 			}
@@ -43,7 +43,7 @@ public class CommonFileService {
 			int len = SocketStream.readInteger(is);
 			HDFSEXTFile file = HDFSEXTFileFactory.createHDFSEXTFile(len,
 					hdfsfilesRepository);
-			file.save(is, len, storeid);
+			file.save(is, len, storepath);
 			SocketStream.writeInteger(FileOperateMark.UPLOADSUCCESS, out);
 		} catch (IOException e) {
 			try {

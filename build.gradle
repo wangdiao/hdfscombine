@@ -18,14 +18,14 @@ dependencies {
     compile 'commons-lang:commons-lang:2.6'
     compile 'commons-logging:commons-logging-api:1.1'
     compile 'commons-pool:commons-pool:1.6'
-    compile 'org.springframework:spring-beans:3.2.4.RELEASE'
-    compile 'org.springframework:spring-context:3.2.4.RELEASE'
-    compile 'org.springframework:spring-core:3.2.4.RELEASE'
-    compile 'org.springframework:spring-expression:3.2.4.RELEASE'
-    compile 'org.springframework:spring-tx:3.2.4.RELEASE'
-    compile 'org.springframework:spring-web:3.2.4.RELEASE'
-    compile 'org.springframework:spring-webmvc:3.2.4.RELEASE'
-    compile 'org.springframework.data:spring-data-redis:1.1.0.RELEASE'
+    compile 'org.springframework:spring-beans:4.0.0.RELEASE'
+    compile 'org.springframework:spring-context:4.0.0.RELEASE'
+    compile 'org.springframework:spring-core:4.0.0.RELEASE'
+    compile 'org.springframework:spring-expression:4.0.0.RELEASE'
+    compile 'org.springframework:spring-tx:4.0.0.RELEASE'
+    compile 'org.springframework:spring-web:4.0.0.RELEASE'
+    compile 'org.springframework:spring-webmvc:4.0.0.RELEASE'
+    compile 'org.springframework.data:spring-data-redis:1.1.1.RELEASE'
     
     compile 'log4j:log4j:1.2.17'
     compile 'org.slf4j:slf4j-api:1.7.5'
@@ -33,19 +33,22 @@ dependencies {
     
     compile 'com.google.guava:guava:15.0'
     compile 'com.google.protobuf:protobuf-java:2.5.0'
-    compile('org.apache.hadoop:hadoop-auth:2.1.0-beta'){
+    compile('org.apache.hadoop:hadoop-auth:2.2.0'){
         transitive = false
     }
-    compile('org.apache.hadoop:hadoop-common:2.1.0-beta'){
+    compile('org.apache.hadoop:hadoop-common:2.2.0'){
         transitive = false
     }
-    compile('org.apache.hadoop:hadoop-hdfs:2.1.0-beta'){
+    compile('org.apache.hadoop:hadoop-hdfs:2.2.0'){
         transitive = false
     }
-    compile 'redis.clients:jedis:2.0.0'
+    compile 'redis.clients:jedis:2.1.0'
     testCompile "junit:junit:4.11"
 }
 eclipse {
+  classpath{
+    downloadSources=true
+  }
   wtp {
     facet {
       //you can add some extra wtp facets; mandatory keys: 'name', 'version':

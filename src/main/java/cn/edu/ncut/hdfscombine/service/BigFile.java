@@ -32,7 +32,7 @@ public class BigFile implements HDFSEXTFile {
 	}
 
 	@Override
-	public void save(InputStream is, long filelen, String filename)
+	public void save(InputStream is, int filelen, String filename)
 			throws IOException {
 		String md5filename = DigestUtils.md5Hex(filename);
 		String hdfsname = basepath+md5filename;
@@ -48,7 +48,7 @@ public class BigFile implements HDFSEXTFile {
 		//添加元数据项
 		//TODO: 大文件计划不保存元数据
 		MetaFile metaFile = new MetaFile();
-		metaFile.setLength(filelen);
+		metaFile.setLength(new Long(filelen));
 		metaFile.setName(new File(filename).getName());
 		metaFile.setStorename(md5filename);
 		metaFile.setStorepos(-1L);

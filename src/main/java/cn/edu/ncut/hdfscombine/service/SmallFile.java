@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.hadoop.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,21 +39,14 @@ public class SmallFile implements HDFSEXTFile {
 	private HdfsfilesRepository hdfsfilesRepository;
 
 	@Override
-	public void save(InputStream is, long filelen, String filename)
+	public void save(InputStream is, int filelen, String storepath)
 			throws IOException {
 		// 保存到文件缓存中
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try {
-			IOUtils.copyBytes(is, out, filelen, false);
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			throw e;
-		}
 		CacheFile cacheFile = new CacheFile();
-		cacheFile.setContent(out.toByteArray());
-		cacheFile.setLength(filelen);
-		cacheFile.setName(new File(filename).getName());
-		long maplen = hdfsfilesRepository.addCacheFileByName(filename, cacheFile);
+		cacheFile.setContent(IOUtils.toByteArray(is, filelen));
+		cacheFile.setLength(new Long(filelen));
+		cacheFile.setName(new File(storepath).getName());
+		long maplen = hdfsfilesRepository.addCacheFileByName(storepath, cacheFile);
 
 		// 打包
 		if (maplen + filelen > filesize) {
@@ -78,8 +71,11 @@ public class SmallFile implements HDFSEXTFile {
 	@Override
 	public boolean delete(String filename) throws IOException {
 		if (hdfsfilesRepository.isExist(filename)) {
-			hdfsfilesRepository.delCacheFile(filename);
+			String pathid = hdfsfilesRepository.getPathId(filename);
+			hdfsfilesRepository.delPath(filename);
+			hdfsfilesRepository.delCacheFile(pathid);
 		} else {
+			hdfsfilesRepository.delPath(filename);
 			MetaFile metaFile = hdfsfilesRepository.getMetaFile(filename);
 			if (metaFile.getStorepos() != -1L)
 				return false;
@@ -111,7 +107,7 @@ public class SmallFile implements HDFSEXTFile {
 		}
 		InputStream is = new ByteArrayInputStream(cacheFile.getContent());
 		SocketStream.writeInteger(cacheFile.getLength().intValue(), out);
-		IOUtils.copyBytes(is, out, 4096);
+		IOUtils.copy(is, out);
 		return true;
 	}
 
